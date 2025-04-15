@@ -7,13 +7,21 @@ import (
 
 type Ctx struct {
 	Context context.Context
+	cancel  context.CancelFunc
 	Cfg     *Config
-	Logger  *zap.Logger
+	Log     *zap.Logger
 }
 
 func NewCtx(cfg *Config, logger *zap.Logger) *Ctx {
+	ctx, cancel := context.WithCancel(context.Background())
 	return &Ctx{
-		Cfg:    cfg,
-		Logger: logger,
+		Context: ctx,
+		cancel:  cancel,
+		Cfg:     cfg,
+		Log:     logger,
 	}
+}
+
+func (c *Ctx) Cancel() {
+	c.cancel()
 }

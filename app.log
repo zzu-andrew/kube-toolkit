@@ -1,0 +1,5 @@
+{"level":"error","ts":"2025-04-15T20:35:42.892+0800","caller":"network/main.go:69","msg":"Failed to parse config","error":"Error reading config file: open xxx.yaml: The system cannot find the file specified."}
+{"level":"error","ts":"2025-04-15T20:36:24.522+0800","caller":"network/main.go:69","msg":"Failed to parse config","error":"Error reading config file: open xxx.yaml: The system cannot find the file specified."}
+{"level":"error","ts":"2025-04-15T20:38:07.336+0800","caller":"network/main.go:69","msg":"Failed to parse config","error":"Error reading config file: open xxx.yaml: The system cannot find the file specified."}
+{"level":"error","ts":"2025-04-15T20:40:34.152+0800","caller":"network/main.go:69","msg":"Failed to parse config","error":"Error reading config file: open xxx.yaml: The system cannot find the file specified."}
+{"level":"info","ts":"2025-04-15T20:40:52.522+0800","caller":"network/main.go:93","msg":"Starting kube-tools","git versions info":""}

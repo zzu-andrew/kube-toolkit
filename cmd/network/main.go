@@ -4,13 +4,30 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/zzu-andrew/toolkit/config"
+	"github.com/zzu-andrew/toolkit/pkg/tea"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
 	"os/signal"
 	"syscall"
 
-	"kube-tools/utils"
+	"github.com/zzu-andrew/toolkit/utils"
 )
+
+func init() {
+	// 支持命令前缀匹配
+	cobra.EnablePrefixMatching = true
+}
+
+// Service config a struct with stop chan
+type Service struct {
+	stop chan os.Signal
+}
+
+var svc = &Service{
+	stop: make(chan os.Signal, 1),
+}
 
 func Start() error {
 	// 创建日志记录器， 每个 100M, 两个备份，最多三个，备份日志最长保存30天，压缩备份日志
@@ -20,9 +37,7 @@ func Start() error {
 		return err
 	}
 
-	log.Info("Starting proxy!", zap.String("Config info", "/v1/data"),
-		zap.Any("git versions info", utils.GetVersion()))
-
+	ctx := config.NewCtx(config.GetConfig(), log)
 	// capture signals
 	go func() {
 		defer func(log *zap.Logger) {
@@ -33,7 +48,7 @@ func Start() error {
 		}(log)
 
 		select {
-		case <-ctx.Ctx.Done():
+		case <-ctx.Context.Done():
 			return
 			// Quit all goroutines
 			//ctx.Cancel()
@@ -45,18 +60,22 @@ func Start() error {
 	}()
 	// 配置文件路径
 	rootCmd := &cobra.Command{
-		Use:        "ysp_installer",
-		Short:      "ysp_installer is a automated deployment tools",
-		Long:       `Automated deployment tool for deploying ysp stand-alone and cluster`,
-		SuggestFor: []string{"ysp_installer --config.file xxx.yaml"},
+		Use:        "toolkit",
+		Short:      "toolkit is a automated k8s tools",
+		Long:       `Automated get the k8s infos`,
+		SuggestFor: []string{"toolkit --config.file xxx.yaml"},
 
 		Run: func(cmd *cobra.Command, args []string) {
-			// Parse configuration file info
+			// 解析配置文件
+			err = config.ParseConfig()
+			if err != nil {
+				log.Error("Failed to parse config", zap.Error(err))
+			}
 
+			tea.Tea()
 			// Quit all goroutines
 			ctx.Cancel()
 			log.Info("shutting down...")
-
 		},
 	}
 
@@ -70,7 +89,8 @@ func Start() error {
 	}
 	viper.SetConfigType("yaml")
 
-	rootCmd.SetUsageFunc(usageFunc)
+	log.Info("Starting kube-tools", zap.Any("git versions info", utils.GetVersion()))
+
 	// Make help just show the usage
 	rootCmd.SetHelpTemplate(`{{.UsageString}}`)
 	// Capture signals
@@ -78,5 +98,8 @@ func Start() error {
 	return rootCmd.Execute()
 }
 func main() {
-	// TODO: add your code here
+	if err := Start(); err != nil {
+		fmt.Println("Failed to start proxy")
+		return
+	}
 }
