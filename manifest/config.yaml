@@ -1,0 +1,21 @@
+Global:
+PkgServers:
+  config:
+    # sftp,ftp
+    type: "sftp"
+    address: "10.161.30.211:22"
+    timeout: 10000
+    username: "root"
+    password: "Bingo@1993"
+  path: "/home/packages"
+
+ConfigServers:
+  - config:
+      address: "10.161.30.211:22"
+      username: "root"
+      password: "Bingo@1993"
+      timeout: 10000
+    path: "/home"
+    hostName: "ims"
+    internalIp: "10.161.40.240"
+    externalIp: "10.161.40.240"
